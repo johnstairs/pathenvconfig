@@ -21,7 +21,7 @@ var ErrInvalidSpecification = errors.New("specification must be a struct pointer
 var re = regexp2.MustCompile(`([A-Z]+(?![a-z]))|([A-Z]?[a-z0-9]+)`, 0)
 
 func Process(prefix string, spec interface{}) error {
-	if !strings.HasSuffix("_", prefix) {
+	if len(prefix) > 0 && !strings.HasSuffix("_", prefix) {
 		prefix += "_"
 	}
 

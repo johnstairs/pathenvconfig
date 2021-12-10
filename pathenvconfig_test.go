@@ -62,6 +62,21 @@ func TestEnvionmentVariables(t *testing.T) {
 	assert.True(t, spec.IsDog)
 }
 
+func TestEnvionmentVariablesNoPrefix(t *testing.T) {
+	os.Setenv("NAME", "Charlie")
+	defer os.Unsetenv("NAME")
+	os.Setenv("AGE", "8")
+	defer os.Unsetenv("AGE")
+	os.Setenv("IS_DOG", "true")
+	defer os.Unsetenv("IS_DOG")
+
+	spec := ConfigSpec{}
+	require.Nil(t, Process("", &spec))
+	assert.Equal(t, "Charlie", spec.Name)
+	assert.Equal(t, 8, spec.Age)
+	assert.True(t, spec.IsDog)
+}
+
 func TestDefaults(t *testing.T) {
 	setVariable(t.Name(), "NAME", "Tom")
 	spec := ConfigSpec{}
