@@ -99,9 +99,14 @@ func getEnvironmentValue(fieldPointer interface{}, variableName string, required
 		}
 	}
 
-	_, err := fmt.Sscan(val, fieldPointer)
-	if err != nil {
-		return fmt.Errorf("unable to convert value for environment variable '%s' to target type %t", variableName, reflect.TypeOf(fieldPointer))
+	switch typedPointer := fieldPointer.(type) {
+	case *string:
+		*typedPointer = val
+	default:
+		_, err := fmt.Sscan(val, fieldPointer)
+		if err != nil {
+			return fmt.Errorf("unable to convert value for environment variable '%s' to target type %t", variableName, reflect.TypeOf(fieldPointer))
+		}
 	}
 
 	return nil
