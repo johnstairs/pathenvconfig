@@ -111,6 +111,14 @@ func TestFileEnvionmentVariables(t *testing.T) {
 	assert.True(t, spec.IsDog)
 }
 
+func TestValueWithSpaces(t *testing.T) {
+	setVariable(t.Name(), "NAME", "Oona the Dog")
+
+	spec := ConfigSpec{}
+	require.Nil(t, Process(t.Name(), &spec))
+	assert.Equal(t, "Oona the Dog", spec.Name)
+}
+
 func setVariable(prefix, name, value string) {
 	os.Setenv(fmt.Sprintf("%s_%s", prefix, name), value)
 }
