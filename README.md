@@ -34,6 +34,24 @@ Or you can provide an environment variable with the suffix `_FILE` that contains
 export MY_APP_DATABASE_CONNECTION_STRING_FILE="/path/to/a/file.txt"
 ```
 
-## Limitations
+### Nested Structs
 
-The implementation is currenly very basic. Field types can only be primitives.
+Nested structs are also supported:
+
+```go
+type DatabaseConfig struct {
+	User     string `required:"true"`
+	Password string `required:"true"`
+}
+
+type MyConfig struct {
+	Database       DatabaseConfig
+	TimeoutSeconds int            `default:"10"`
+}
+```
+
+The properties can be set with these environment variables:
+
+- `MY_APP_DATABASE_USER` or `MY_APP_DATABASE_USER_FILE`
+- `MY_APP_DATABASE_PASSWORD` or `MY_APP_DATABASE_PASSWORD_FILE`
+- `MY_APP_TIMEOUT` or `MY_APP_TIMEOUT_FILE`

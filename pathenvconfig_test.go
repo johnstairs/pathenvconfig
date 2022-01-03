@@ -45,21 +45,24 @@ func TestFieldNameToVariable(t *testing.T) {
 }
 
 type ConfigSpec struct {
-	Name  string `required:"true"`
-	Age   int    `default:"13"`
-	IsDog bool
+	Name   string `required:"true"`
+	Age    int    `default:"13"`
+	IsDog  bool
+	Weight *int
 }
 
 func TestEnvionmentVariables(t *testing.T) {
 	setVariable(t.Name(), "NAME", "Oona")
 	setVariable(t.Name(), "AGE", "3")
 	setVariable(t.Name(), "IS_DOG", "true")
+	setVariable(t.Name(), "WEIGHT", "50")
 
 	spec := ConfigSpec{}
 	require.Nil(t, Process(t.Name(), &spec))
 	assert.Equal(t, "Oona", spec.Name)
 	assert.Equal(t, 3, spec.Age)
 	assert.True(t, spec.IsDog)
+	assert.Equal(t, 50, *spec.Weight)
 }
 
 func TestEnvionmentVariablesNoPrefix(t *testing.T) {
@@ -121,4 +124,28 @@ func TestValueWithSpaces(t *testing.T) {
 
 func setVariable(prefix, name, value string) {
 	os.Setenv(fmt.Sprintf("%s_%s", prefix, name), value)
+}
+
+type DatabaseConfig struct {
+	User     string
+	Password string
+}
+
+type WithNesteStruct struct {
+	Db     DatabaseConfig
+	DbPtr  *DatabaseConfig
+	DbPtr2 *DatabaseConfig
+	DbPtr3 *DatabaseConfig
+}
+
+func TestNestedMap(t *testing.T) {
+	setVariable(t.Name(), "DB_USER", "Oscar")
+	setVariable(t.Name(), "DB_PTR_USER", "Bert")
+
+	spec := WithNesteStruct{DbPtr3: &DatabaseConfig{}}
+	require.Nil(t, Process(t.Name(), &spec))
+	assert.Equal(t, "Oscar", spec.Db.User)
+	assert.Equal(t, "Bert", spec.DbPtr.User)
+	assert.Nil(t, spec.DbPtr2)
+	assert.NotNil(t, spec.DbPtr3)
 }
