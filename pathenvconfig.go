@@ -21,11 +21,11 @@ var ErrInvalidSpecification = errors.New("specification must be a struct pointer
 var re = regexp2.MustCompile(`([A-Z]+(?![a-z]))|([A-Z]?[a-z0-9]+)`, 0)
 
 func Process(prefix string, spec interface{}) error {
-	_, err := ProcessImpl(prefix, spec)
+	_, err := processImpl(prefix, spec)
 	return err
 }
 
-func ProcessImpl(prefix string, spec interface{}) (changed bool, err error) {
+func processImpl(prefix string, spec interface{}) (changed bool, err error) {
 	if len(prefix) > 0 && !strings.HasSuffix("_", prefix) {
 		prefix += "_"
 	}
@@ -73,7 +73,7 @@ func ProcessImpl(prefix string, spec interface{}) (changed bool, err error) {
 				structPtr = fieldValue.Interface()
 			}
 
-			valueSet, err := ProcessImpl(variableName, structPtr)
+			valueSet, err := processImpl(variableName, structPtr)
 			if err != nil {
 				return changed, err
 			}
@@ -83,7 +83,7 @@ func ProcessImpl(prefix string, spec interface{}) (changed bool, err error) {
 			}
 			changed = changed || valueSet
 		} else if fieldType.Type.Kind() == reflect.Struct {
-			valueSet, err := ProcessImpl(variableName, pointerToField)
+			valueSet, err := processImpl(variableName, pointerToField)
 			if err != nil {
 				return changed, err
 			}
