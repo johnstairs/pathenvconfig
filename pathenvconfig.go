@@ -122,7 +122,7 @@ func assignFromEnvironmentValue(fieldPointer interface{}, variableName string, r
 				log.Panicf("Unable to read file %s for environment variable %s", path, variableName)
 			}
 
-			val = string(bytes)
+			val = strings.TrimRight(string(bytes), "\r\n")
 		} else {
 			if defaultValue == nil {
 				if required {

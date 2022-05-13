@@ -122,6 +122,36 @@ func TestValueWithSpaces(t *testing.T) {
 	assert.Equal(t, "Oona the Dog", spec.Name)
 }
 
+func TestTailingNewlineRemovedFromFile(t *testing.T) {
+	// verify that the trailing newline is removed when reading from a file
+	testCases := []struct {
+		input    string
+		expected string
+	}{
+		{"Ralph", "Ralph"},
+		{"Ralph\n", "Ralph"},
+		{"Ralph\r\n", "Ralph"},
+		{"Ralph\n", "Ralph"},
+		{"\nRalph\n", "\nRalph"},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.input, func(t *testing.T) {
+			namePath := path.Join(t.TempDir(), "name.txt")
+			require.Nil(t, os.WriteFile(namePath, []byte(tC.input), 0644))
+			setVariable(t.Name(), "NAME_FILE", namePath)
+			spec := ConfigSpec{}
+			require.Nil(t, Process(t.Name(), &spec))
+			assert.Equal(t, tC.expected, spec.Name)
+		})
+	}
+
+	// But not removed from environment variables.
+	setVariable(t.Name(), "NAME", "Oona\n")
+	spec := ConfigSpec{}
+	require.Nil(t, Process(t.Name(), &spec))
+	assert.Equal(t, "Oona\n", spec.Name)
+}
+
 func setVariable(prefix, name, value string) {
 	os.Setenv(fmt.Sprintf("%s_%s", prefix, name), value)
 }
